@@ -1,2 +1,3 @@
 *.txt
-
+!TSP_1000_euclideanDistance.txt
+!TSP_1000_randomDistance.txt
