@@ -81,22 +81,22 @@ GraphData loadGraphFromFile(const std::string &filename) {
   return graph;
 }
 
-// Calculate path length using the Matrix
+// calculate path length using the matrix
 double getPathCost(const std::vector<int> &path,
                    const std::vector<std::vector<double>> &matrix) {
   double total = 0;
   for (size_t i = 0; i < path.size(); ++i) {
     int u = path[i];
-    int v = path[(i + 1) % path.size()]; // Wrap around
+    int v = path[(i + 1) % path.size()]; // wrap around
     if (matrix[u][v] == INF) {
-      return INF; // Invalid path check
+      return INF; // invalid path check
     }
     total += matrix[u][v];
   }
   return total;
 }
 
-//intial path construction
+// intial path construction
 void nearestNeighbor(const GraphData &graph, int startNode,
                      std::vector<int> &path) {
   int n = graph.numNodes;
@@ -134,7 +134,7 @@ void nearestNeighbor(const GraphData &graph, int startNode,
   }
 }
 
-//post optimization
+// post optimization
 void twoOpt(std::vector<int> &path, const GraphData &graph,
             long long &evalCount) {
   int n = path.size();
@@ -194,16 +194,9 @@ void twoOpt(std::vector<int> &path, const GraphData &graph,
   }
 }
 
-int main(int argc, char **argv) {
-  if (argc != 2) {
-    std::cerr << "Usage: " << argv[0] << " <file_path>" << std::endl;
-    return 1;
-  }
-  std::string filename = argv[1];
-
+std::tuple<GraphData, double, std::vector<int>> solve(std::string filename) {
   GraphData graph = loadGraphFromFile(filename);
   int N = graph.numNodes;
-
 
   double bestCost = INF;
   std::vector<int> bestTour;
@@ -218,7 +211,7 @@ int main(int argc, char **argv) {
 
     nearestNeighbor(graph, startNodeIndex, currentPath);
 
-	twoOpt(currentPath, graph, evalCount);
+    twoOpt(currentPath, graph, evalCount);
 
     double currentCost = getPathCost(currentPath, graph.distMatrix);
 
@@ -227,7 +220,6 @@ int main(int argc, char **argv) {
       bestTour = currentPath; // copy only if better
     }
   }
-
 
   auto end = std::chrono::high_resolution_clock::now();
   std::chrono::duration<double> elapsed = end - start;
@@ -238,20 +230,41 @@ int main(int argc, char **argv) {
             << "\n";
   std::cerr << "Total Time: " << elapsed.count() << "s\n";
 
+  return {graph, bestCost, bestTour};
+}
+
+int main(int argc, char **argv) {
+  if (argc != 3) {
+    std::cerr << "Usage: " << argv[0] << " <euclidean_file> <random_file>"
+              << std::endl;
+    return 1;
+  }
+
+  std::string euclideanFile = argv[1];
+  std::string randomFile = argv[2];
+
+  auto [euclidGraph, euclidCost, euclidTour] = solve(euclideanFile);
+
+  auto [randomGraph, randomCost, randomTour] = solve(randomFile);
+
   std::string outputFilename = "solution_919858479.txt";
   std::ofstream outFile(outputFilename);
 
   if (!outFile.is_open()) {
-    std::cerr << "could not open " << outputFilename
-              << " for writing.\n";
+    std::cerr << "Could not open " << outputFilename << " for writing.\n";
     return 1;
   }
 
-  for (size_t i = 0; i < bestTour.size(); ++i) {
-    outFile << graph.indexToId[bestTour[i]] << ", ";
+  for (size_t i = 0; i < euclidTour.size(); ++i) {
+    outFile << euclidGraph.indexToId[euclidTour[i]] << ", ";
   }
 
-  outFile << graph.indexToId[bestTour[0]];
+  outFile << euclidGraph.indexToId[euclidTour[0]] << "\n";
+
+  for (size_t i = 0; i < randomTour.size(); ++i) {
+    outFile << randomGraph.indexToId[randomTour[i]] << ", ";
+  }
+  outFile << randomGraph.indexToId[randomTour[0]];
 
   outFile.close();
 
