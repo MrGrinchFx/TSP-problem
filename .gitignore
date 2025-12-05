@@ -1,3 +1,4 @@
+project
 *.txt
 !TSP_1000_euclidianDistance.txt
 !TSP_1000_randomDistance.txt

@@ -1,5 +1,5 @@
-#include <algorithm>
 #include <chrono>
+#include <algorithm>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
@@ -234,14 +234,9 @@ std::tuple<GraphData, double, std::vector<int>> solve(std::string filename) {
 }
 
 int main(int argc, char **argv) {
-  if (argc != 3) {
-    std::cerr << "Usage: " << argv[0] << " <euclidean_file> <random_file>"
-              << std::endl;
-    return 1;
-  }
 
-  std::string euclideanFile = argv[1];
-  std::string randomFile = argv[2];
+  std::string euclideanFile = "TSP_1000_euclidianDistance.txt";
+  std::string randomFile = "TSP_1000_randomDistance.txt";
 
   auto [euclidGraph, euclidCost, euclidTour] = solve(euclideanFile);
 
